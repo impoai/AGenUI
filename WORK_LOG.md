@@ -1,3 +1,5 @@
 # Work log
 
+- 2026-10-19 | Kept the root package in CommonJS mode after CI exposed the HarmonyOS toolchain inheriting its module type. ES modules remain scoped to `platforms/web` and explicit `.mjs` scripts. The Web build/tests/package and Android build passed in GitHub Actions; HarmonyOS is rechecked against the corrected root configuration.
+
 - 2026-10-19 | Added an experimental WebAssembly platform to the Impo fork of AGenUI 1.7.0. Compiled the shared C++ core and pinned Yoga into Wasm, added an asynchronous Web scheduler, JS/TypeScript session API, extensible DOM adapter, 11 initial component types, example, packaging with licenses and CI. The native platform code is unchanged except for a portable logger include. Validation: Wasm build, 12 real-Wasm logic tests, declarations, package contents, diff check and manual Chromium light/dark/1440/390 checks passed. Native CTest has the same 19 failures on both upstream and modified sources; details and screenshots are in `platforms/web/docs/validation.md`. Safari, Firefox, physical devices and packaged Electron remain unverified. No Impo product integration or npm publication was performed.

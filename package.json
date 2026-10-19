@@ -1,7 +1,7 @@
 {
   "name": "agenui-workspace",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build:web": "node scripts/web/build.mjs",
     "test:web": "node --test platforms/web/test/*.test.mjs",
