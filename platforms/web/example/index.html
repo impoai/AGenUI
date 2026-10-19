@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AGenUI · WebAssembly renderer</title>
+<link rel="stylesheet" href="../dist/styles.css">
+<style>
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; background: light-dark(#f5f5f3,#191a19); color: light-dark(#232724,#e9eeeb); }
+body { margin: 0 auto; padding: 48px 24px; max-width: 1100px; }
+header { margin-bottom: 32px; } h1 { font-size: clamp(28px,4vw,44px); font-weight: 550; letter-spacing: -.04em; margin: 12px 0; }
+p { line-height: 1.6; } .eyebrow { font: 12px ui-monospace,monospace; letter-spacing: .1em; color: #618675; }
+.workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,.8fr); gap:32px; align-items:start; }
+.card { background:light-dark(white,#242725); border:1px solid #8883; border-radius:16px; padding:24px; min-width:0; }
+h2 { font-size:15px; margin:0 0 14px; } pre { white-space:pre-wrap; word-break:break-word; font-size:12px; line-height:1.7; }
+.toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
+.toolbar button { font:inherit; color:inherit; border:1px solid #8885; border-radius:8px; padding:9px 15px; background:transparent; cursor:pointer; }
+#status { font-size:13px; color:#618675; } #errors { color:#c84c3d; } footer { font-size:12px; margin-top:24px; opacity:.7; }
+@media(max-width:720px){body{padding:24px 16px}.workspace{grid-template-columns:1fr}.card{padding:16px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">IMPO / AGENUI WEB</div><h1>One core. A new surface.</h1><p>The native C++ engine and Yoga layout, running in WebAssembly.</p><div id="status" role="status">Loading the engine…</div></header>
+<div class="toolbar"><button id="reset" disabled>Reset form</button><button id="patch" disabled>Send server update</button><button id="theme" disabled>Switch theme</button></div>
+<div class="workspace"><section class="card" aria-label="Generated interface"><div id="surface"></div></section><aside class="card"><h2>Action from the C++ core</h2><p>Change the destination, checkbox or slider, then select Plan this trip.</p><pre id="action" aria-live="polite">No action yet.</pre><p id="errors" role="alert"></p></aside></div>
+<footer>Experimental Web adapter · Core v1.7.0 · No account, provider key or network request from generated content.</footer>
+<script type="module">
+import {createRuntime} from '../dist/index.js';
+import {createDOMRenderer} from '../dist/dom.js';
+import {fixture} from '../example/fixture.js';
+const status=document.querySelector('#status'), errors=document.querySelector('#errors');
+try {
+ const runtime=await createRuntime({onError:e=>errors.textContent=e.message});
+ const renderer=createDOMRenderer(runtime,document.querySelector('#surface'),{
+  onAction:value=>document.querySelector('#action').textContent=JSON.stringify(value,null,2),
+  onError:e=>errors.textContent=e.message,
+ });
+ let dark=matchMedia('(prefers-color-scheme:dark)').matches;
+ const setTheme=()=>{document.documentElement.style.colorScheme=dark?'dark':'light';runtime.setTheme(dark?'dark':'light')};
+ setTheme();renderer.render(fixture());
+ status.textContent=`C++ core ${runtime.version} loaded · Wasm + Yoga · Browser adapter`;
+ document.querySelectorAll('.toolbar button').forEach(b=>b.disabled=false);
+ document.querySelector('#reset').onclick=()=>{renderer.render(fixture());document.querySelector('#action').textContent='No action yet.';errors.textContent=''};
+ document.querySelector('#patch').onclick=()=>renderer.session.render(JSON.stringify({version:'v0.9',updateDataModel:{surfaceId:'travel',path:'/',value:{city:'Kyoto',outdoors:false,days:7}}}));
+ document.querySelector('#theme').onclick=()=>{dark=!dark;setTheme()};
+ window.addEventListener('pagehide',()=>{renderer.dispose();runtime.dispose()},{once:true});
+} catch(e){status.textContent='Engine could not load';errors.textContent=e.message;}
+</script>
+</body>
+</html>

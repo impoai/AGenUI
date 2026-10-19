@@ -1,0 +1,22 @@
+/* Copyright 2026 Impo. SPDX-License-Identifier: Apache-2.0 */
+.agenui-surface { position: relative; width: 100%; }
+.agenui-node { position: absolute; box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; font-size: 16px; line-height: 1.5; color: inherit; }
+.agenui-node[hidden] { display: none; }
+.agenui-text { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
+.agenui-button { cursor: pointer; appearance: none; border: 1px solid; }
+.agenui-button:focus-visible, .agenui-label input:focus-visible { outline: 3px solid #4886eb; outline-offset: 2px; }
+.agenui-button:disabled { cursor: default; opacity: .5; }
+.agenui-label { display: flex; flex-direction: column; gap: 4px; box-sizing: border-box; padding: 6px 10px; height: 100%; width: 100%; font: inherit; }
+.agenui-label input { font: inherit; color: inherit; min-width: 0; min-height: 30px; border: 1px solid #8886; border-radius: 4px; background: transparent; padding: 2px 6px; box-sizing: border-box; width: 100%; }
+.agenui-checkbox .agenui-label { flex-direction: row-reverse; justify-content: flex-end; align-items: center; }
+.agenui-checkbox input { width: 20px; height: 20px; min-height: 20px; }
+.agenui-slider input { padding: 0; }
+.agenui-slider output { font-variant-numeric: tabular-nums; font-size: 12px; }
+.agenui-divider { border-top: 1px solid #8886; }
+.agenui-unsupported { color: #a32b2b; }
+.agenui-measurement { position: fixed; left: -100000px; top: 0; visibility: hidden; pointer-events: none; width: max-content; }
+.agenui-measuring { position: relative; display: inline-block; width: max-content; height: auto; min-height: 0; }
+.agenui-measuring.agenui-textfield { min-height: 76px; min-width: 180px; }
+.agenui-measuring.agenui-checkbox { min-height: 44px; min-width: 120px; }
+.agenui-measuring.agenui-slider { min-height: 90px; min-width: 160px; }
+.agenui-measuring.agenui-divider { height: 1px; }

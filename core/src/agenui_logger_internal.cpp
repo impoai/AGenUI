@@ -1,4 +1,5 @@
 #include "agenui_logger_internal.h"
+#include <cstdarg>
 
 #define LOG_SIZE (4 * 1024)
 #define LOG_SIZE_DEBUG (1024 * 1024)

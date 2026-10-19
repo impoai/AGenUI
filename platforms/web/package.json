@@ -1,0 +1,16 @@
+{
+  "name": "@impoai/agenui-web",
+  "version": "0.1.0",
+  "description": "AGenUI's shared C++ core and Yoga compiled to WebAssembly, with an extensible DOM renderer",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./dom": { "types": "./dist/dom.d.ts", "import": "./dist/dom.js" },
+    "./agenui.wasm": "./dist/agenui.wasm",
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": ["dist", "README.md", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.txt"],
+  "repository": { "type": "git", "url": "https://github.com/impoai/AGenUI.git", "directory": "platforms/web" },
+  "engines": { "node": ">=22" }
+}

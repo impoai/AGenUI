@@ -1,0 +1,10 @@
+{
+  "name": "agenui-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:web": "node scripts/web/build.mjs",
+    "test:web": "node --test platforms/web/test/*.test.mjs",
+    "dev:web": "node scripts/web/serve.mjs"
+  }
+}

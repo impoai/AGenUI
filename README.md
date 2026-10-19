@@ -36,6 +36,13 @@ English | [中文](README.zh-CN.md)
 
 ---
 
+## Impo fork: experimental WebAssembly platform
+
+This fork adds a browser platform using the same AGenUI C++ core and Yoga.
+It includes a Wasm build, JavaScript/TypeScript API, an extensible DOM renderer,
+a runnable example and tests. See [Web setup and supported components](platforms/web/README.md).
+The existing iOS, Android and HarmonyOS platforms are preserved.
+
 ## What is AGenUI?
 
 **AGenUI** is an A2UI SDK that simultaneously supports iOS, Android, and HarmonyOS. Built on and fully implementing the [A2UI v0.9 protocol open-sourced by Google](https://github.com/google/A2UI), it renders the streaming data of LLM-generated interactive UI in real time on mobile devices. Under the hood, it is powered by a cross-platform **shared C++ core engine**, while the three-platform rendering engines consume the component protocol dispatched by the core engine and perform drawing using native system capabilities.
