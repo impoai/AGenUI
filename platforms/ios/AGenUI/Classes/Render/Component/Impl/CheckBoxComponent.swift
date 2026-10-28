@@ -175,6 +175,10 @@ class CheckBoxComponent: Component {
     override func updateProperties(_ diff: [String: DiffValue]) {
         // Call parent method to apply CSS properties to self
         super.updateProperties(diff)
+        if diff["styles"] != nil {
+            loadLocalStyleConfig()
+            if let button = checkBoxButton { applyAppearance(to: button) }
+        }
         
         // Update label text
         if case .value(let label) = diff["label"] {
@@ -228,7 +232,7 @@ class CheckBoxComponent: Component {
     
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             Logger.shared.debug("Using default configuration")
             return
         }
@@ -315,6 +319,13 @@ class CheckBoxComponent: Component {
         let button = CheckBoxButton()
         button.addTarget(self, action: #selector(checkBoxButtonTapped(_:)), for: .touchUpInside)
         
+        applyAppearance(to: button)
+
+        self.checkBoxButton = button
+        addSubview(button)
+    }
+
+    private func applyAppearance(to button: CheckBoxButton) {
         // Apply configuration to CheckBoxButton
         button.checkboxSize = checkboxSize
         button.checkboxBorderWidth = checkboxBorderWidth
@@ -329,11 +340,11 @@ class CheckBoxComponent: Component {
         button.textColor = textColor
         button.textColorDisabled = textColorDisabled
         button.textSize = textSize
+        if let color = (properties["styles"] as? [String: Any])?["checkbox-checkmark-color"] as? String,
+           let value = ComponentStyleConfigManager.parseColorToUIColor(color) { button.checkmarkColor = value }
         
-        self.checkBoxButton = button
-        addSubview(button)
     }
-    
+
     /// Create error label
     private func createErrorLabel() {
         let label = UILabel()

@@ -82,12 +82,12 @@ public class ChoicePickerComponent extends A2UIComponent {
         containerLayout = new LinearLayout(context);
         containerLayout.setOrientation(LinearLayout.VERTICAL);
 
-        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("ChoicePicker");
+        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("ChoicePicker", properties.get("styles"));
         parseProperties();
-        filterQuery = "";
         FormLabelView title = new FormLabelView(context);
         Object label = properties.get("label");
         title.updateLabel(label);
+        if (styleConfig.containsKey("text-color")) title.setTextColor(StyleHelper.parseColor(styleConfig.get("text-color")));
         containerLayout.addView(title);
 
         if (filterable) {
@@ -102,6 +102,7 @@ public class ChoicePickerComponent extends A2UIComponent {
         containerLayout.addView(choiceContainer);
 
         rebuildChoices(context);
+        if (filterEditText != null) filterEditText.setText(filterQuery);
 
         errorTextView = new TextView(context);
         errorTextView.setTextColor(Color.RED);
@@ -124,12 +125,12 @@ public class ChoicePickerComponent extends A2UIComponent {
         containerLayout.removeAllViews();
         errorTextView = null;
 
-        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("ChoicePicker");
+        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("ChoicePicker", properties.get("styles"));
         parseProperties();
-        filterQuery = "";
         FormLabelView title = new FormLabelView(context);
         Object label = properties.get("label");
         title.updateLabel(label);
+        if (styleConfig.containsKey("text-color")) title.setTextColor(StyleHelper.parseColor(styleConfig.get("text-color")));
         containerLayout.addView(title);
 
         if (filterable) {
@@ -146,6 +147,7 @@ public class ChoicePickerComponent extends A2UIComponent {
         containerLayout.addView(choiceContainer);
 
         rebuildChoices(context);
+        if (filterEditText != null) filterEditText.setText(filterQuery);
 
         errorTextView = new TextView(context);
         errorTextView.setTextColor(Color.RED);
@@ -594,6 +596,7 @@ public class ChoicePickerComponent extends A2UIComponent {
     }
 
     private void applyCheckBoxStyle(Context context, CustomCheckBoxView checkBoxView) {
+        if (styleConfig.containsKey("checkbox-checkmark-color")) checkBoxView.setCheckMarkColor(StyleHelper.parseColor(styleConfig.get("checkbox-checkmark-color")));
         String sizeStr = styleConfig.get("checkbox-size");
         if (sizeStr != null) {
             int size = StyleHelper.parseDimension(sizeStr, context);

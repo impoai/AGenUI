@@ -28,6 +28,57 @@ async function setup(t) {
 const node = (session, id, surface = 'travel') => session.surfaces.get(surface)?.get(id);
 const update = (surfaceId, value) => JSON.stringify({ version: 'v0.9', updateDataModel: { surfaceId, path: '/', value } });
 
+test('local calculator actions update bound state without agent events or cross-session writes', async t => {
+  const runtime = await createRuntime();
+  t.after(() => runtime.dispose());
+  runtime.registerMeasurement('Text', () => ({ width: 200, height: 48 }));
+  const events = [];
+  const session = runtime.createSession({ onEvent: e => events.push(e) });
+  const other = runtime.createSession();
+  const buttons = [
+    ['digit', { call: 'formatString', args: { value: '${/expression}2' } }],
+    ['operator', { call: 'formatString', args: { value: '${/expression}+' } }],
+    ['equals', { call: 'calculate', args: { expression: { path: '/expression' } } }],
+    ['clear', ''],
+  ].flatMap(([id, value]) => [
+    { id, component: 'Button', child: id + 'Label', action: { functionCall: { call: 'setValue', args: { targetPath: '/expression', value } } } },
+    { id: id + 'Label', component: 'Text', text: id },
+  ]);
+  const document = [
+    { createSurface: { surfaceId: 'calc' } },
+    { updateDataModel: { surfaceId: 'calc', path: '/', value: { expression: '' } } },
+    { updateComponents: { surfaceId: 'calc', components: [
+      { id: 'root', component: 'Column', children: ['display', 'digit', 'operator', 'equals', 'clear', 'send'] },
+      { id: 'display', component: 'Text', text: { path: '/expression' } },
+      ...buttons,
+      { id: 'send', component: 'Button', child: 'sendLabel', action: { event: { name: 'Send result', context: { result: { path: '/expression' } } } } },
+      { id: 'sendLabel', component: 'Text', text: 'Send result to agent' },
+    ] } },
+  ].map(value => JSON.stringify({ version: 'v0.9', ...value })).join('\n');
+  session.render(document); other.render(document);
+  await until(() => node(session, 'display', 'calc') && node(other, 'display', 'calc'), 'calculator render');
+  for (const [key, expected] of [['digit', '2'], ['operator', '2+'], ['digit', '2+2'], ['equals', '4']]) {
+    session.action('calc', key);
+    await until(() => node(session, 'display', 'calc').text === expected, key);
+  }
+  runtime.setTheme('dark'); session.resize('calc', 600, 800);
+  await delay(30);
+  assert.equal(node(session, 'display', 'calc').text, '4');
+  assert.equal(node(other, 'display', 'calc').text, '');
+  assert.equal(events.filter(e => e.type === 'action').length, 0);
+  session.action('calc', 'send');
+  await until(() => events.some(e => e.type === 'action'), 'explicit agent action');
+  assert.deepEqual(events.find(e => e.type === 'action').value.action.context, { result: '4' });
+  for (const [expression, expected] of [['(2+3)*4', '20'], ['0.1+0.2', '0.3'], ['1/0', 'Cannot divide by zero'], ['globalThis.fetch(1)', 'Invalid expression'], ['9'.repeat(600), 'Invalid expression']]) {
+    session.render(update('calc', { expression }));
+    session.action('calc', 'equals');
+    await until(() => node(session, 'display', 'calc').text === expected, expression.slice(0, 20));
+  }
+  session.action('calc', 'clear');
+  await until(() => node(session, 'display', 'calc').text === '', 'clear after error');
+  assert.equal(events.filter(e => e.type === 'action').length, 1);
+});
+
 test('ships a real Wasm module built from the upstream core', async t => {
   const bytes = await readFile(new URL('../dist/agenui.wasm', import.meta.url));
   assert.deepEqual([...bytes.subarray(0, 4)], [0, 97, 115, 109]);

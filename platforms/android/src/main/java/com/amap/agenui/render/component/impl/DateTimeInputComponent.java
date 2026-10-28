@@ -426,6 +426,10 @@ public class DateTimeInputComponent extends A2UIComponent {
         // Re-parse properties
         parseProperties(changedProps);
 
+        if (changedProps.containsKey("styles") && containerLayout != null) {
+            Context context = containerLayout.getContext();
+            compactStyle = loadCompactStyle(loadStyleConfig(context), context);
+        }
         // Update display
         updateDisplay();
     }
@@ -441,7 +445,7 @@ public class DateTimeInputComponent extends A2UIComponent {
      * Load style configuration
      */
     private ComponentStyleConfig.StyleHashMap<String, String> loadStyleConfig(Context context) {
-        ComponentStyleConfig.StyleHashMap<String, String> styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("DateTimeInput");
+        ComponentStyleConfig.StyleHashMap<String, String> styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("DateTimeInput", properties.get("styles"));
         if (AGenUILogger.isLoggingEnabled()) {
             AGenUILogger.d(TAG, "Loaded style config: " + styleConfig);
         }

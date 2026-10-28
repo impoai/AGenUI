@@ -92,7 +92,7 @@ public class TableComponent extends A2UIComponent {
      * Load style configuration
      */
     private ComponentStyleConfig.StyleHashMap<String, String> loadStyleConfig(Context context) {
-        ComponentStyleConfig.StyleHashMap<String, String> styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("Table");
+        ComponentStyleConfig.StyleHashMap<String, String> styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("Table", properties.get("styles"));
         if (AGenUILogger.isLoggingEnabled()) {
             AGenUILogger.d(TAG, "Loaded style config: " + styleConfig);
         }
@@ -127,6 +127,9 @@ public class TableComponent extends A2UIComponent {
 
         // Parse data row background color array
         config.bodyBgColors = parseBodyBgColors(styleConfig, context);
+        if (styleConfig.containsKey("body-bg-color-even") && styleConfig.containsKey("body-bg-color-odd")) {
+            config.bodyBgColors = java.util.Arrays.asList(StyleHelper.parseColor(styleConfig.get("body-bg-color-even")), StyleHelper.parseColor(styleConfig.get("body-bg-color-odd")));
+        }
 
         // Parse data row font color
         String bodyFontColor = styleConfig.getOrDefault("body-font-color", "#000000");
@@ -342,6 +345,7 @@ public class TableComponent extends A2UIComponent {
         Map<String, Object> merged = this.properties;
 
         // Parse style configuration (only parse horizontal-scroll and column-weights)
+        tableStyle = loadTableStyle(loadStyleConfig(context), context);
         parseStyles(merged);
 
         // Clear existing table content

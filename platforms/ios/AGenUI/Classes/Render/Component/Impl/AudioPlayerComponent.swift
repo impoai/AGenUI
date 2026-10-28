@@ -434,6 +434,7 @@ class AudioPlayerComponent: Component {
     override func updateProperties(_ diff: [String: DiffValue]) {
         // Call parent method to apply CSS properties to self
         super.updateProperties(diff)
+        if diff["styles"] != nil { loadLocalStyleConfig() }
         
         // Update audio URL
         if case .value(let urlValue) = diff["url"] {
@@ -457,7 +458,7 @@ class AudioPlayerComponent: Component {
     // MARK: - Private Methods
     
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else { return }
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else { return }
         audioButton.loadStyleConfig(config)
     }
     

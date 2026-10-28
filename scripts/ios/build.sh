@@ -93,6 +93,10 @@ esac
 [[ -f "$RUNNER" ]] || error "Underlying build script not found: ${RUNNER}"
 [[ -d "$IOS_PROJECT_ROOT" ]] || error "iOS project directory not found: ${IOS_PROJECT_ROOT}"
 ensure_core_dir
+# CocoaPods path dependencies do not rerun prepare_command after core edits.
+# Refresh this disposable source mirror even when reusing an installed workspace.
+mkdir -p "${AGENUI_ROOT}/platforms/ios/core"
+rsync -a --delete "${AGENUI_ROOT}/core/" "${AGENUI_ROOT}/platforms/ios/core/"
 check_version_consistency
 fetch_build_id "ios"
 

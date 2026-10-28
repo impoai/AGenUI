@@ -175,6 +175,8 @@ class CheckBoxButton: UIControl {
         return imageView
     }()
     
+    var checkmarkColor: UIColor = .white { didSet { checkMarkImageView.tintColor = checkmarkColor } }
+
     // MARK: - Initialization
     
     override init(frame: CGRect) {

@@ -159,6 +159,11 @@ class CarouselComponent: Component {
     override func updateProperties(_ diff: [String: DiffValue]) {
         // Call parent method to apply CSS properties to self
         super.updateProperties(diff)
+        if diff["styles"] != nil {
+            loadLocalStyleConfig()
+            customPageIndicatorView?.backgroundColor = indicatorBackgroundColor
+            updateCustomPageIndicator()
+        }
         
         // Update autoplay
         if case .value(let v) = diff["autoplay"], let autoplayValue = v as? Bool {
@@ -209,7 +214,7 @@ class CarouselComponent: Component {
 
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             Logger.shared.debug("Using default configuration")
             return
         }

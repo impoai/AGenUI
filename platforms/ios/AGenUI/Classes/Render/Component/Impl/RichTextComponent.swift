@@ -125,13 +125,13 @@ class RichTextComponent: Component {
         }
         
         // Extract styles if present
-        var styles: [String: Any]?
+        var styles = properties["styles"] as? [String: Any]
         if case .value(let stylesValue) = diff["styles"] {
             styles = stylesValue as? [String: Any]
         }
         
         // Get rich text content (supports both String and numeric types)
-        var contentString: String?
+        var contentString = properties["literalString"] as? String ?? properties["text"] as? String
         if case .value(let v) = diff["literalString"], let s = v as? String {
             contentString = s
         } else if case .value(let v) = diff["text"], let s = v as? String {

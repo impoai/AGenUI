@@ -232,6 +232,8 @@ public class CustomCheckBoxView extends View {
     /**
      * Sets the checked state background color
      */
+    public void setCheckMarkColor(int color) { checkPaint.setColor(color); invalidate(); }
+
     public void setCheckedBackgroundColor(int color) {
         if (this.checkedBackgroundColor != color) {
             this.checkedBackgroundColor = color;

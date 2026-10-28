@@ -15,6 +15,7 @@
 #include "function_call/builtins/agenui_numeric_functioncall.h"
 #include "function_call/builtins/agenui_email_functioncall.h"
 #include "function_call/builtins/agenui_format_number_functioncall.h"
+#include "function_call/builtins/agenui_calculate_functioncall.h"
 #include "function_call/builtins/agenui_format_currency_functioncall.h"
 #include "function_call/builtins/agenui_format_date_functioncall.h"
 #include "function_call/builtins/agenui_pluralize_functioncall.h"
@@ -244,6 +245,7 @@ void SurfaceCoordinator::initFunctionCalls() {
     functionCallManager->registerFunctionCall(std::make_shared<NumericFunctionCall>());
     functionCallManager->registerFunctionCall(std::make_shared<EmailFunctionCall>());
     functionCallManager->registerFunctionCall(std::make_shared<FormatNumberFunctionCall>());
+    functionCallManager->registerFunctionCall(std::make_shared<CalculateFunctionCall>());
     functionCallManager->registerFunctionCall(std::make_shared<FormatCurrencyFunctionCall>());
     functionCallManager->registerFunctionCall(std::make_shared<FormatDateFunctionCall>());
     functionCallManager->registerFunctionCall(std::make_shared<PluralizeFunctionCall>());

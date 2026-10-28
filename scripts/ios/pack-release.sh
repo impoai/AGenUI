@@ -113,6 +113,8 @@ cp -R "$BUNDLE_SRC" "$STAGE_DIR/"
 
 info "Staging LICENSE..."
 cp "${AGENUI_ROOT}/LICENSE" "$STAGE_DIR/"
+cp "${AGENUI_ROOT}/NOTICE" "$STAGE_DIR/"
+cp "${PLATFORMS_DIR}/ios/vendor/yoga/LICENSE" "$STAGE_DIR/YOGA-LICENSE"
 
 # -------------------- Create zip --------------------
 ZIP_NAME="AGenUI-${AGENUI_SDK_VERSION}-ios.zip"
@@ -120,7 +122,7 @@ ZIP_PATH="${OUTPUT_DIR}/${ZIP_NAME}"
 
 info "Creating ${ZIP_NAME}..."
 cd "$STAGE_DIR"
-zip -r -q "$ZIP_PATH" AGenUI.xcframework AGenUI.bundle LICENSE
+zip -r -q "$ZIP_PATH" AGenUI.xcframework AGenUI.bundle LICENSE NOTICE YOGA-LICENSE
 cd "$AGENUI_ROOT"
 
 # -------------------- Cleanup stage --------------------

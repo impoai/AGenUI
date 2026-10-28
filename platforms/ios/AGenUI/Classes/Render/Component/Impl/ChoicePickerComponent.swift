@@ -170,6 +170,18 @@ private class SearchInputView: UIView {
         backgroundColor = viewBackgroundColor
     }
 
+    func applyAppearance(_ styles: [String: Any]) {
+        func color(_ key: String, _ fallback: UIColor) -> UIColor {
+            (styles[key] as? String).flatMap(ComponentStyleConfigManager.parseColorToUIColor) ?? fallback
+        }
+        textField.textColor = color("filter-text-color", textColor)
+        textField.attributedPlaceholder = NSAttributedString(string: "Filter options…", attributes: [.foregroundColor: color("filter-hint-color", placeholderColor)])
+        backgroundColor = color("filter-background-color", viewBackgroundColor)
+        layer.borderColor = color("filter-border-color", borderColor).cgColor
+        searchIconImageView.tintColor = color("filter-hint-color", iconColor)
+        clearButton.tintColor = color("filter-hint-color", iconColor)
+    }
+
     // MARK: - Layout
 
     /// Manual horizontal layout: [icon] [textField (flex)] [clearButton]
@@ -614,6 +626,10 @@ class ChoicePickerComponent: Component {
 
     override func updateProperties(_ diff: [String: DiffValue]) {
         super.updateProperties(diff)
+        if diff["styles"] != nil { loadLocalStyleConfig() }
+        titleLabel.textColor = textColor
+        noResultsLabel?.textColor = textColor
+        searchInputView?.applyAppearance(properties["styles"] as? [String: Any] ?? [:])
         titleLabel.update(diff["label"])
         setNeedsLayout()
 
@@ -673,6 +689,9 @@ class ChoicePickerComponent: Component {
             noResultsLabel?.isHidden = true
         }
 
+        // Recreated controls must also retain selection on a style-only diff.
+        if diff["value"] == nil { updateSelectedValue(properties["value"] ?? []) }
+
         // Update selected state (data update from C++)
         if case .value(let value) = diff["value"] {
             isUpdatingFromNative = true
@@ -719,7 +738,7 @@ class ChoicePickerComponent: Component {
 
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             return
         }
 
@@ -838,6 +857,8 @@ class ChoicePickerComponent: Component {
             button.unselectedBorderColor = unselectedBorderColor
             button.textMargin = textMargin
             button.textColor = textColor
+            if let color = (properties["styles"] as? [String: Any])?["checkbox-checkmark-color"] as? String,
+               let value = ComponentStyleConfigManager.parseColorToUIColor(color) { button.checkmarkColor = value }
             button.textSize = textSize
 
             if variant == "mutuallyExclusive" {
@@ -871,9 +892,14 @@ class ChoicePickerComponent: Component {
             chipButton.paddingHorizontal = 16
             chipButton.paddingVertical = 8
             chipButton.selectedBackgroundColor = selectedBackgroundColor
-            chipButton.selectedTextColor = .white
-            chipButton.unselectedBackgroundColor = .clear
-            chipButton.unselectedBorderColor = UIColor.black.withAlphaComponent(0.1)
+            let styles = properties["styles"] as? [String: Any] ?? [:]
+            func color(_ key: String, _ fallback: UIColor) -> UIColor {
+                (styles[key] as? String).flatMap(ComponentStyleConfigManager.parseColorToUIColor) ?? fallback
+            }
+            chipButton.selectedBackgroundColor = color("chip-background-color-selected", selectedBackgroundColor)
+            chipButton.selectedTextColor = color("chip-text-color-selected", .white)
+            chipButton.unselectedBackgroundColor = color("chip-background-color", .clear)
+            chipButton.unselectedBorderColor = color("chip-border-color", unselectedBorderColor)
             chipButton.unselectedTextColor = textColor
 
             chipButton.addTarget(self, action: #selector(chipButtonTapped(_:)), for: .touchUpInside)

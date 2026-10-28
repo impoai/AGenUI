@@ -168,6 +168,12 @@ public class CarouselComponent extends A2UIComponent {
             return;
         }
 
+        if (changedProps.containsKey("styles")) {
+            applyCarouselStyles();
+            updateIndicatorDots();
+            updateIndicatorSelection(viewPager.getCurrentItem());
+        }
+
         // Update image URL list
         if (changedProps.containsKey("content")) {
             Object contentObj = changedProps.get("content");
@@ -452,7 +458,7 @@ public class CarouselComponent extends A2UIComponent {
      */
     private void applyCarouselStyles() {
         ComponentStyleConfig config = ComponentStyleConfig.getInstance(context);
-        ComponentStyleConfig.StyleHashMap<String, String> styles = config.getComponentStyle("Carousel");
+        ComponentStyleConfig.StyleHashMap<String, String> styles = config.getComponentStyle("Carousel", properties.get("styles"));
 
         // Indicator dot spacing
         indicatorDotSpacing = StyleHelper.parseDimension(

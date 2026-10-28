@@ -1,6 +1,6 @@
 {
   "name": "@impoai/agenui-web",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AGenUI's shared C++ core and Yoga compiled to WebAssembly, with an extensible DOM renderer",
   "license": "Apache-2.0",
   "type": "module",

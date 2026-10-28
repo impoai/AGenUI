@@ -627,9 +627,10 @@ class TableComponent: Component {
     override func updateProperties(_ diff: [String: DiffValue]) {
         // Call parent method to apply CSS properties to self
         super.updateProperties(diff)
+        if diff["styles"] != nil { loadLocalStyleConfig() }
 
         // Skip table rebuild when no table-relevant keys changed
-        guard diff["columns"] != nil || diff["rows"] != nil else {
+        guard diff["columns"] != nil || diff["rows"] != nil || diff["styles"] != nil else {
             return
         }
 
@@ -654,7 +655,7 @@ class TableComponent: Component {
     
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             Logger.shared.debug("Using default configuration")
             return
         }
@@ -765,6 +766,11 @@ class TableComponent: Component {
             styleConfig.bodyBgColors = bgColors.compactMap { ComponentStyleConfigManager.parseColorToUIColor($0) }
         }
         
+        let alternating = ["body-bg-color-even", "body-bg-color-odd"].compactMap { key in
+            (config[key] as? String).flatMap(ComponentStyleConfigManager.parseColorToUIColor)
+        }
+        if alternating.count == 2 { styleConfig.bodyBgColors = alternating }
+
         if let color = config["body-font-color"] as? String,
            let value = ComponentStyleConfigManager.parseColorToUIColor(color) {
             styleConfig.bodyFontColor = value

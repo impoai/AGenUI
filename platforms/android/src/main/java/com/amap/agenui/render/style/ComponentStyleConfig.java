@@ -133,6 +133,22 @@ public class ComponentStyleConfig {
      * @param componentName Component name
      * @return Component style configuration map (StyleHashMap), or an empty map if not found
      */
+    /** Merge resolved per-instance styles without mutating shared defaults. */
+    public StyleHashMap<String, String> getComponentStyle(String componentName, Object resolvedStyles) {
+        StyleHashMap<String, String> result = new StyleHashMap<>();
+        result.putAll(getComponentStyle(componentName));
+        if (resolvedStyles instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) resolvedStyles).entrySet()) {
+                if (!(entry.getKey() instanceof String) || entry.getValue() == null) continue;
+                String key = (String) entry.getKey();
+                String value = String.valueOf(entry.getValue());
+                result.put(key, value);
+                if (componentName.equals("DateTimeInput")) result.put("compact." + key, value);
+            }
+        }
+        return result;
+    }
+
     public StyleHashMap<String, String> getComponentStyle(String componentName) {
         StyleHashMap<String, String> componentStyle = styles.get(componentName);
         if (componentStyle == null) {

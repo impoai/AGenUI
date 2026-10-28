@@ -183,6 +183,15 @@ class TextFieldComponent: Component {
 
     override func updateProperties(_ diff: [String: DiffValue]) {
         super.updateProperties(diff)
+        if diff["styles"] != nil {
+            let showingPlaceholder = isTextViewShowingPlaceholder()
+            loadLocalStyleConfig()
+            if let field = textField { applyTextStyle(to: field); applyPlaceholderStyle(to: field) }
+            if let view = textView {
+                applyTextStyle(to: view)
+                if showingPlaceholder { view.textColor = placeholderColor }
+            }
+        }
         
         // Check if input control type needs switching
         if case .value(let v) = diff["variant"], let variant = v as? String {
@@ -376,7 +385,7 @@ class TextFieldComponent: Component {
     
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             Logger.shared.debug("Using default configuration")
             return
         }
@@ -445,6 +454,8 @@ class TextFieldComponent: Component {
                 }
             }
         }
+        if let color = config["placeholder-color"] as? String,
+           let value = ComponentStyleConfigManager.parseColorToUIColor(color) { placeholderColor = value }
     }
     
     private func resolveFont(size: CGFloat) -> UIFont {

@@ -80,7 +80,7 @@ public class AudioPlayerComponent extends A2UIComponent {
      */
     private void applyAudioPlayerStyles(Context context) {
         Map<String, String> styleConfig = ComponentStyleConfig.getInstance(context)
-                .getComponentStyle("AudioPlayer");
+                .getComponentStyle("AudioPlayer", properties.get("styles"));
 
         if (styleConfig == null || styleConfig.isEmpty()) {
             return;
@@ -301,6 +301,7 @@ public class AudioPlayerComponent extends A2UIComponent {
 
     @Override
     protected void onUpdateProperties(Map<String, Object> changedProps) {
+        if (changedProps.containsKey("styles") && audioPlayerView != null) applyAudioPlayerStyles(audioPlayerView.getContext());
         if (changedProps.containsKey("url")) {
             release();
             if (audioPlayerView != null) {

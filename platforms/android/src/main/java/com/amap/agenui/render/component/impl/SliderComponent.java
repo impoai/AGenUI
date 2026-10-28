@@ -60,7 +60,7 @@ public class SliderComponent extends A2UIComponent {
     @Override
     protected View onCreateView(Context context) {
         // Load style configuration
-        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("Slider");
+        styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("Slider", properties.get("styles"));
 
         // Create vertical layout container
         containerLayout = new LinearLayout(context);
@@ -107,6 +107,12 @@ public class SliderComponent extends A2UIComponent {
 
     @Override
     protected void onUpdateProperties(Map<String, Object> changedProps) {
+        if (changedProps.containsKey("styles") && containerLayout != null) {
+            Context context = containerLayout.getContext();
+            styleConfig = ComponentStyleConfig.getInstance(context).getComponentStyle("Slider", properties.get("styles"));
+            applySliderStyles(context);
+            if (styleConfig.containsKey("color")) labelTextView.setTextColor(StyleHelper.parseColor(styleConfig.get("color")));
+        }
         applyProperties(changedProps);
     }
 

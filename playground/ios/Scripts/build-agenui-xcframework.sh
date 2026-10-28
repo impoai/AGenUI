@@ -134,6 +134,7 @@ XCODEBUILD_ARGS+=(
 #   embed DWARF debug info directly into the static library binary (instead of generating a separate dSYM), causing ~7x size bloat
 #   The final artifact will be stripped of debug symbols after creating the xcframework
 COMMON_XCODEBUILD_ARGS=(
+    IPHONEOS_DEPLOYMENT_TARGET="${AGENUI_IOS_DEPLOYMENT_TARGET:-15.0}"
     ONLY_ACTIVE_ARCH=NO
     MACH_O_TYPE=staticlib
     BUILD_LIBRARY_FOR_DISTRIBUTION=YES
@@ -270,7 +271,7 @@ xcodebuild build \
     OBJROOT="${IPHONEOS_SYMROOT}/obj" \
     SYMROOT="${IPHONEOS_SYMROOT}/sym" \
     -derivedDataPath "${IPHONEOS_SYMROOT}/DerivedData" \
-    | tail -20
+    2>&1 | tee "${BUILD_DIR}/iphoneos.log" | tail -20
 
 # Locate framework in SYMROOT
 IPHONEOS_FRAMEWORK_PATH=$(find "${IPHONEOS_SYMROOT}" -name "${SCHEME}.framework" -type d | head -1)
@@ -303,7 +304,7 @@ xcodebuild build \
     OBJROOT="${IPHONESIM_SYMROOT}/obj" \
     SYMROOT="${IPHONESIM_SYMROOT}/sym" \
     -derivedDataPath "${IPHONESIM_SYMROOT}/DerivedData" \
-    | tail -20
+    2>&1 | tee "${BUILD_DIR}/iphonesimulator.log" | tail -20
 
 # Locate framework in SYMROOT
 IPHONESIM_FRAMEWORK_PATH=$(find "${IPHONESIM_SYMROOT}" -name "${SCHEME}.framework" -type d | head -1)
@@ -471,7 +472,7 @@ done
 # -------------------- Copy resources --------------------
 info "Copying resources to XCFramework..."
 
-BUNDLE_SOURCE="${PROJECT_ROOT}/AGenUI/Assets/AGenUI.bundle"
+BUNDLE_SOURCE="${SCRIPT_DIR}/../../../platforms/ios/AGenUI/Assets/AGenUI.bundle"
 if [[ -d "$BUNDLE_SOURCE" ]]; then
     # Copy bundle to each platform slice in the xcframework
     for platform_dir in "${XCFRAMEWORK_OUTPUT}"/*/; do
@@ -487,7 +488,7 @@ fi
 
 # Copy privacy manifest to framework root (belt-and-suspenders to ensure Apple scanning tools can detect it)
 info "Copying privacy manifest..."
-PRIVACY_SOURCE="${PROJECT_ROOT}/AGenUI/Assets/AGenUI.bundle/PrivacyInfo.xcprivacy"
+PRIVACY_SOURCE="${BUNDLE_SOURCE}/PrivacyInfo.xcprivacy"
 if [[ -f "$PRIVACY_SOURCE" ]]; then
     for platform_dir in "${XCFRAMEWORK_OUTPUT}"/*/; do
         framework_dir=$(find "${platform_dir}" -name "*.framework" -type d -maxdepth 1 | head -1)

@@ -35,8 +35,10 @@ internal class ComponentStyleConfigManager {
     ///
     /// - Parameter componentType: Component type (e.g., "Carousel", "Button", etc.)
     /// - Returns: Configuration dictionary, or nil if not found
-    func getConfig(for componentType: String) -> [String: Any]? {
-        return configs[componentType]
+    func getConfig(for componentType: String, styles: [String: Any]? = nil) -> [String: Any]? {
+        guard var result = configs[componentType] else { return styles }
+        result.merge(styles ?? [:]) { _, resolved in resolved }
+        return result
     }
     
     // MARK: - Private Methods

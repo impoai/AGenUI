@@ -121,6 +121,18 @@ class SliderComponent: Component {
     
     override func updateProperties(_ diff: [String: DiffValue]) {
         super.updateProperties(diff)
+        if diff["styles"] != nil {
+            loadLocalStyleConfig()
+            slider?.minimumTrackTintColor = minimumTrackColor
+            slider?.maximumTrackTintColor = maximumTrackColor
+            slider?.setMinimumTrackImage(createTrackImage(color: minimumTrackColor), for: .normal)
+            slider?.setMaximumTrackImage(createTrackImage(color: maximumTrackColor), for: .normal)
+            let thumb = createCustomThumbImage()
+            slider?.setThumbImage(thumb, for: .normal)
+            slider?.setThumbImage(thumb, for: .highlighted)
+            if let color = (properties["styles"] as? [String: Any])?["color"] as? String,
+               let value = ComponentStyleConfigManager.parseColorToUIColor(color) { titleLabel.textColor = value }
+        }
         titleLabel.update(diff["label"])
         setNeedsLayout()
         
@@ -171,7 +183,7 @@ class SliderComponent: Component {
     
     /// Load local style configuration
     private func loadLocalStyleConfig() {
-        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType) else {
+        guard let config = ComponentStyleConfigManager.shared.getConfig(for: componentType, styles: properties["styles"] as? [String: Any]) else {
             return
         }
         

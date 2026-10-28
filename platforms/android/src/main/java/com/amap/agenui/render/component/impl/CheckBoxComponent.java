@@ -323,6 +323,7 @@ public class CheckBoxComponent extends A2UIComponent {
         if (styles == null || styles.isEmpty()) {
             return;
         }
+        if (styles.containsKey("checkbox-checkmark-color")) customCheckBox.setCheckMarkColor(StyleHelper.parseColor(styles.get("checkbox-checkmark-color")));
 
         // Handle CheckBox style properties
         if (styles.containsKey("checkbox-size")) {
